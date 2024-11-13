@@ -54,3 +54,13 @@ export const signin = async (req, res) => {
     console.log(error);
   }
 };
+
+export const getMe = async (req, res) => {
+  try {
+    console.log(req.user);
+    console.log(user);
+    res.status(200).json({ message: 'request reached' });
+  } catch (error) {
+    console.log(error);
+  }
+};
