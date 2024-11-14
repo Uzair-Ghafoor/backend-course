@@ -44,7 +44,7 @@ export const signin = async (req, res) => {
     if (!correctPassword) {
       return res.status(401).json({ error: 'invalid credentials.' });
     }
-
+    //require('crypto').randomBytes(64).toString('hex');
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
@@ -57,8 +57,6 @@ export const signin = async (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
-    console.log(req.user);
-    console.log(user);
     res.status(200).json({ message: 'request reached' });
   } catch (error) {
     console.log(error);
