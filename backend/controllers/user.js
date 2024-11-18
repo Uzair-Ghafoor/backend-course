@@ -37,6 +37,7 @@ export const signin = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
+    // .select('-password');
     if (!user) {
       return res.status(404).json({ error: 'no user found with this id.' });
     }
@@ -49,7 +50,8 @@ export const signin = async (req, res) => {
       expiresIn: '1d',
     });
     const { password: pass, ...others } = user._doc;
-    res.cookie('secret', token).status(200).json(others);
+
+    res.cookie('secret', token).status(200).json(user);
   } catch (error) {
     console.log(error);
   }

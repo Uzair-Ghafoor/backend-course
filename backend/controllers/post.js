@@ -19,10 +19,8 @@ export const createPost = async (req, res) => {
 export const getPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await Post.findById(id)
-      .populate('userId', 'username email')
-      .populate('comments.user', 'username email');
-
+    const post = await Post.findById(id).populate('userId', 'username email');
+    // .select('-_id');
     res.status(200).json(post);
   } catch (error) {
     console.log(error);
@@ -33,18 +31,43 @@ export const commentOnPost = async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
+    const user = req.user._id;
     const post = await Post.findById(id);
+
     if (!post) {
-      return res.statu(404).json({ message: 'no post found with this id' });
+      res.status(400).json({ message: 'post has already been deleted.' });
     }
     const commentOnPost = await Post.findByIdAndUpdate(
       id,
       {
-        $push: { comments: { user: req.user._id, content } },
+        $push: {
+          comments: {
+            user,
+            content,
+          },
+        },
       },
       { new: true }
     );
-    res.status(200).json({ message: 'comment placed successfully.' });
+
+    res.status(200).json(commentOnPost);
+  } catch (error) {
+    console.log('console', error);
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Post.findById(id);
+    if (req.user._id.toString() !== post.userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: 'You can only delete your own post.' });
+    }
+
+    const deletePost = await Post.findByIdAndDelete(id);
+    res.status(200).json({ message: 'Post deleted successfully.' });
   } catch (error) {
     console.log(error);
   }
