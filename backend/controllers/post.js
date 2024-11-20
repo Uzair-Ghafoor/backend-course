@@ -1,14 +1,19 @@
 import { Post } from '../models/posts.js';
 import User from '../models/user.js';
+import cloudinary from '../utils/cloudinary.js';
 
 export const createPost = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const { content } = req.body;
+    const { content, imageUrl } = req.body;
+    console.log(imageUrl, content);
+    if (imageUrl) {
+      const result = await cloudinary.uploader.upload(imageUrl);
+      console.log(result);
+    }
 
     const newPost = await Post.create({
-      userId,
       content,
+      imageUrl: result.secure_url,
     });
     res.status(201).json(newPost);
   } catch (error) {
