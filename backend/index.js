@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import userRouter from './routes/user.js';
 import cors from 'cors';
 import postRouter from './routes/post.js';
+import fileUpload from 'express-fileupload';
 const app = express();
 app.use(cookieParser());
 app.use(cors());

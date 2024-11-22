@@ -1,26 +1,32 @@
 import { Post } from '../models/posts.js';
 import User from '../models/user.js';
+import fs from 'fs';
 import cloudinary from '../utils/cloudinary.js';
 
 export const createPost = async (req, res) => {
   try {
-    const { content, imageUrl } = req.body;
-    console.log(imageUrl, content);
-    if (imageUrl) {
-      const result = await cloudinary.uploader.upload(imageUrl);
-      console.log(result);
-    }
-
+    const { content } = req.body;
+    console.log(req.file);
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      width: 400,
+      height: 400,
+      crop: 'fill',
+      transformations: [{ format: 'jpg' }],
+    });
+    console.log(result);
+    const imageUrl = result.secure_url;
     const newPost = await Post.create({
       content,
-      imageUrl: result.secure_url,
+      imageUrl,
     });
+    fs.unlinkSync(req.file.path);
+
     res.status(201).json(newPost);
   } catch (error) {
-    console.log(error);
+    console.error('Error Creating Post:', error);
+    res.status(500).json({ error: 'Failed to create post' });
   }
 };
-
 export const getPost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -65,14 +71,24 @@ export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
     const post = await Post.findById(id);
-    if (req.user._id.toString() !== post.userId.toString()) {
-      return res
-        .status(403)
-        .json({ message: 'You can only delete your own post.' });
-    }
 
-    const deletePost = await Post.findByIdAndDelete(id);
+    //https://res.cloudinary.com/dbj3pmxeh/image/upload/v1732256188/fsqj2ghytehr4lcaap8h.png
+
+    const image_id = post.imageUrl.split('/').pop().split('.')[0];
+
+    await cloudinary.uploader.destroy(image_id);
+
+    await Post.findByIdAndDelete(id);
     res.status(200).json({ message: 'Post deleted successfully.' });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({});
+    res.status(200).json(posts);
   } catch (error) {
     console.log(error);
   }

@@ -4,34 +4,18 @@ import React, { useState } from 'react';
 const App = () => {
   const [image, setImage] = useState(null);
   const [content, setContent] = useState('');
+  // const [formData, setFormData] = useState({});
 
-  // Handle image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    console.log('File selected:', file); // Log selected file to ensure it's being set
-    if (file) {
-      setImage(file);
-    }
+    setImage(file);
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if image is selected
-    if (!image) {
-      console.log('No image selected');
-      return;
-    }
-
-    // Check if content is entered
-    if (!content) {
-      console.log('No content entered');
-      return;
-    }
-
     // Log current state values before creating FormData
-    console.log('Current Image:', image);
     console.log('Current Content:', content);
 
     // Create FormData and append image and content
@@ -39,18 +23,16 @@ const App = () => {
     formData.append('imageUrl', image);
     formData.append('content', content);
 
-    // Log the FormData content
-    console.log('FormData Entries:');
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ':', pair[1]); // Log each entry in FormData
-    }
+    // const handleChange = (e) => {
+    //   setFormData({ ...formData, [e.target.id]: e.target.value });
+    // };
 
     try {
-      const response = await axios.post(
-        'http://localhost:3000/api/v1/post/create',
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
+      const response = await axios.post('/api/v1/post/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       console.log('Response:', response.data);
     } catch (error) {
       console.error('Error:', error);
