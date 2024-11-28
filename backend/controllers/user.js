@@ -64,3 +64,32 @@ export const getMe = async (req, res) => {
     console.log(error);
   }
 };
+
+export const googleSignup = async (req, res) => {
+  try {
+    const { username, email, avatar } = req.body;
+    const user = await User.findOne({ email });
+
+    if (user) {
+      const token = jwt.sign({ id: user._id }, 'sdfasdfasdf', {});
+
+      return res
+        .cookie('token', token)
+        .status(200)
+        .json({ message: 'signed in' });
+    } else {
+      const newUser = await User.create({
+        username,
+        email,
+      });
+
+      const token = jwt.sign({ id: newUser._id }, 'asdfafdasdf', {});
+      return res
+        .cookie('token', token)
+        .status(201)
+        .json({ message: 'User created.' });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

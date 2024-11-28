@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+import jwt from 'jsonwebtoken';
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -21,6 +21,15 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'user'],
   },
 });
+
+// userSchema.methods.token = function (id) {
+//   this;
+//   return jwt.sign({ id: id }, 'asdfadfasdfa');
+// };
+
+// userSchema.method.comparePassword = function () {
+//   return this.password === this.confrmPassword;
+// };
 
 const User = mongoose.model('User', userSchema);
 
